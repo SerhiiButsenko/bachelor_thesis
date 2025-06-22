@@ -7,8 +7,6 @@ from PanNukeMultiLabelClassificationDataset import PanNukeMultiLabelClassificati
 from pathml.datasets.pannuke import PanNukeDataModule
 from tqdm import tqdm
 
-
-
 # 1. Load and prepare data
 pannuke = PanNukeDataModule(
     data_dir="./data/pannuke/",
