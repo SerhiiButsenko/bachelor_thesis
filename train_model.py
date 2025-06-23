@@ -28,13 +28,10 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, epoch, num_
         optimizer.step()
 
 
-def train_model(model, learning_rate, num_epochs, patience):
+def train_model(data_path, labels_path, model, learning_rate, num_epochs, patience):
 
     # 1. Data preparation
-    download_path = './data/pannuke'
-    labels_path= './data/pannuke_classification_labels'
-
-    pannuke_module = tools.load_pannuke_dataset(download_path, first_download=False, labels_path=labels_path)
+    pannuke_module = tools.load_pannuke_dataset(data_path, first_download=False, labels_path=labels_path)
 
     train_dataloader = tools.create_multilabel_classification_dataloader(pannuke_module, purpose='train', labels_path=labels_path, shuffle=True)
     validation_dataloader = tools.create_multilabel_classification_dataloader(pannuke_module, purpose='valid', labels_path=labels_path, shuffle=True)

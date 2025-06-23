@@ -11,7 +11,10 @@ learning_rate = 0.01
 num_epochs = 50
 patience = 5
 
-train_model(model, learning_rate, num_epochs, patience)
+data_path = './data/pannuke'
+labels_path = './data/pannuke_classification_labels'
+
+train_model(data_path, labels_path, model, learning_rate, num_epochs, patience)
 
 models_to_train = {
     'alexnet': models.alexnet(pretrained=False),
