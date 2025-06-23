@@ -37,8 +37,7 @@ def train_model(data_path, labels_path, model, learning_rate, num_epochs, patien
     validation_dataloader = tools.create_multilabel_classification_dataloader(pannuke_module, purpose='valid', labels_path=labels_path, shuffle=True)
 
     # 2. Model setup
-    #device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
-    device = torch.device("cpu")
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
     # 3. Select the loss function
