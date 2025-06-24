@@ -6,16 +6,31 @@ from torchvision import transforms
 import argparse
 
 def main(args):
-    model = torchvision.models.alexnet(pretrained=False)
+    #model = torchvision.models.alexnet(pretrained=False)
+    model = models.alexnet(pretrained=False)
     model.classifier[6] = nn.Linear(in_features=model.classifier[6].in_features, out_features=6)
-    learning_rate = 0.01
+    learning_rate = 0.0001
     num_epochs = 50
     patience = 5
+    transform = transforms.Compose([
+        transforms.RandomVerticalFlip(p=0.5),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.ColorJitter(
+            brightness=0.2,
+            contrast=0.2,
+            saturation=0.2,
+            hue=0.1
+        ),
+        # RandomRotate90(),
+        transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2.0)),
+       # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        #transforms.ToTensor()
+    ])
 
     #data_path = './data/pannuke'
     #labels_path = './data/pannuke_classification_labels'
 
-    train_model(args.data_path, args.labels_path, model, learning_rate, num_epochs, patience)
+    train_model(args.data_path, args.labels_path, model, learning_rate, num_epochs, patience, None)
 
     models_to_train = {
         'alexnet': models.alexnet(pretrained=False),
