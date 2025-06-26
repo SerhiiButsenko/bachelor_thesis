@@ -6,11 +6,13 @@ from torchvision import transforms
 import argparse
 
 def main(args):
-    model = torchvision.models.alexnet(pretrained=False)
-    model.classifier[6] = nn.Linear(in_features=model.classifier[6].in_features, out_features=6)
-    learning_rate = 0.01
-    num_epochs = 50
-    patience = 5
+    # model = torchvision.models.alexnet(pretrained=True)
+    # model.classifier[6] = nn.Linear(in_features=model.classifier[6].in_features, out_features=6)
+    model = torchvision.models.resnet50(pretrained=True)
+    model.fc = nn.Linear(in_features=model.fc.in_features, out_features=6)
+    learning_rate = 0.0005 #typically 1e-3 and 1e-5, most often 1e-4
+    num_epochs = 500
+    patience = 50
 
     #data_path = './data/pannuke'
     #labels_path = './data/pannuke_classification_labels'
@@ -24,30 +26,37 @@ def main(args):
         'efficientnet-b0': models.efficientnet_b0(pretrained=False)
     }
 
+    # mean, std, total
+    # for every image in validation set
+    #   mean += image.mean(every axis except color axis)
+    #   std += image.std(every axis except color axis)
+    # mean = mean / total
+    # std = std / total
+
     transforms_for_models = {
         'alexnet':
             transforms.Compose([
-                transforms.Resize(256),
+                transforms.Resize(224),
                 transforms.CenterCrop(224),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])]),
+                transforms.Normalize(mean=[0.7406, 0.5332, 0.7059], std=[0.1601, 0.2133, 0.1538])]),
         'inception_v3':
             transforms.Compose([
                 transforms.Resize(299),
                 transforms.CenterCrop(299),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])]),
+                transforms.Normalize(mean=[0.7406, 0.5332, 0.7059], std=[0.1601, 0.2133, 0.1538])]),
         'vgg19':
             transforms.Compose([
                 transforms.Resize((224, 224)),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])]),
+                transforms.Normalize(mean=[0.7406, 0.5332, 0.7059], std=[0.1601, 0.2133, 0.1538])]),
         'efficientnet-b0':
             transforms.Compose([
                 transforms.Resize(256),
-                transforms.CenterCrop(224),
+                transforms.CenterCrop(256),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std =[0.229, 0.224, 0.225])])
+                transforms.Normalize(mean=[0.7406, 0.5332, 0.7059], std=[0.1601, 0.2133, 0.1538])])
     }
 
 parser = argparse.ArgumentParser()

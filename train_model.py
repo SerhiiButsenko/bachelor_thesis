@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 def train_one_epoch(model, dataloader, optimizer, criterion, device, epoch, num_epochs):
     model.train()
+    correct, total = 0, 0
     for images, classes in tqdm(dataloader, desc=f'Epoch {epoch + 1}/{num_epochs}'):
         images, classes = images.to(device), classes.to(device)
 
@@ -27,6 +28,11 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, epoch, num_
         # Update the weights
         optimizer.step()
 
+        # Compute training epoch accuracy
+        correct += torch.round(torch.sigmoid(outputs)).eq(classes).sum()
+        total += classes.numel()
+
+    print(f"Train acc: {correct/total}")
 
 def train_model(data_path, labels_path, model, learning_rate, num_epochs, patience):
 
@@ -37,7 +43,11 @@ def train_model(data_path, labels_path, model, learning_rate, num_epochs, patien
     validation_dataloader = tools.create_multilabel_classification_dataloader(pannuke_module, purpose='valid', labels_path=labels_path, shuffle=True)
 
     # 2. Model setup
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = 'cpu'
+    if torch.cuda.is_available():
+        device = 'cuda'
+    elif torch.mps.is_available():
+        device = 'mps'
     model = model.to(device)
 
     # 3. Select the loss function

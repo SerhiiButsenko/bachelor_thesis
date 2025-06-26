@@ -26,7 +26,7 @@ model = torchvision.models.alexnet()
 model.classifier[6] = nn.Linear(in_features=model.classifier[6].in_features, out_features=6)
 #device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
 #model.load_state_dict(torch.load('alexnet_pannuke.pth', map_location=torch.device('cpu')))
-device = torch.device("cpu")
+device = torch.device("mps")
 model = model.to(device)
 model.eval()
 

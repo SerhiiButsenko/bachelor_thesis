@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torchvision
+from torchvision import transforms
 from torch.utils.data import DataLoader
 from PanNukeMultiLabelClassificationDataset import PanNukeMultiLabelClassificationDataset
 from pathml.datasets.pannuke import PanNukeDataModule
@@ -40,6 +40,7 @@ def create_labels(pannuke_module, purpose, labels_path):
 def load_pannuke_dataset(download_path, first_download, labels_path):
     n_classes_pannuke = 6
     # check the performance based on including/excluding different transformations
+
     transform = A.Compose([
         A.VerticalFlip(p=0.5),
         A.HorizontalFlip(p=0.5),
@@ -65,5 +66,9 @@ def load_pannuke_dataset(download_path, first_download, labels_path):
 def create_multilabel_classification_dataloader(pannuke_module, purpose, labels_path, shuffle):
     labels = torch.load(f'{labels_path}/{purpose}_labels.pt')
     dataloader = getattr(pannuke_module, f'{purpose}_dataloader')
-    dataset = PanNukeMultiLabelClassificationDataset(dataloader.dataset, labels)
+    base_transforms = transforms.Compose([
+        transforms.Normalize(mean=[0.7406, 0.5332, 0.7059], std=[0.1601, 0.2133, 0.1538])
+    ])
+    dataset = PanNukeMultiLabelClassificationDataset(dataloader.dataset, labels, transform=base_transforms)
+    # dataset = torch.utils.data.Subset(dataset, list(range(32)))
     return DataLoader(dataset, batch_size=32, shuffle=shuffle)
