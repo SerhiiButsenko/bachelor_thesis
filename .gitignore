@@ -2,6 +2,7 @@ data/
 imagenet/
 pannuke_training/
 models/
+runs/
 
 .DS_Store
 .idea/

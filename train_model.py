@@ -53,8 +53,16 @@ def train_model(data_path, labels_path, model, learning_rate, num_epochs, patien
     validation_dataloader = tools.create_multilabel_classification_dataloader(pannuke_module, purpose='valid', labels_path=labels_path, shuffle=True, transforms=transforms)
 
     # 2. Model setup
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    elif torch.mps.is_available():
+        device = torch.device('mps')
+    else:
+        device = torch.device('cpu')
+    print(f'Using device: {device}')
     model = model.to(device)
+
+    #tools.calculate_mean_and_std(train_dataloader)
 
     # 3. Select the loss function
     criterion = nn.BCEWithLogitsLoss()
@@ -64,7 +72,7 @@ def train_model(data_path, labels_path, model, learning_rate, num_epochs, patien
     epochs_without_improvement = 0
 
     # 5. Define the optimizer for weight and bias updates
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 
     # 6. Define the training loop
     for epoch in range(num_epochs):
@@ -96,9 +104,12 @@ def train_model(data_path, labels_path, model, learning_rate, num_epochs, patien
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
                 epochs_without_improvement = 0
-                torch.save(model.state_dict(), f'models/AlexNet-{epoch + 1}.pth')
-            else:
+                torch.save(model.state_dict(), f'models/{model.__class__.__name__}-{epoch + 1}.pth')
+            elif epoch % 50 == 0:
+                torch.save(model.state_dict(), f'models/{model.__class__.__name__}-{epoch + 1}.pth')
                 epochs_without_improvement += 1
                 # if epochs_without_improvement >= patience:
                 #     print(f"Stopping early at epoch {epoch + 1}")
                 #     break
+
+    print(f"Best Accuracy: {best_accuracy:.4f}")

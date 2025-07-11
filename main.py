@@ -1,3 +1,4 @@
+import torch
 import torchvision
 import torch.nn as nn
 import torchvision.models as models
@@ -7,11 +8,13 @@ import argparse
 
 def main(args):
     #model = torchvision.models.alexnet(pretrained=False)
-    model = models.alexnet(pretrained=False)
-    model.classifier[6] = nn.Linear(in_features=model.classifier[6].in_features, out_features=6)
-    learning_rate = 0.0001
-    num_epochs = 50
-    patience = 5
+    model = models.resnet50(pretrained=True)
+    model.fc = nn.Linear(in_features=model.fc.in_features, out_features=6)
+    learning_rate = 0.0005
+    num_epochs = 500
+    patience = 50
+    mean = torch.tensor([0.7522, 0.5992, 0.7306])
+    std = torch.tensor([0.1833, 0.2118, 0.1515])
     transform = transforms.Compose([
         transforms.RandomVerticalFlip(p=0.5),
         transforms.RandomHorizontalFlip(p=0.5),
@@ -23,14 +26,14 @@ def main(args):
         ),
         # RandomRotate90(),
         transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2.0)),
-       # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transforms.Normalize(mean=mean, std=std),
         #transforms.ToTensor()
     ])
 
     #data_path = './data/pannuke'
     #labels_path = './data/pannuke_classification_labels'
 
-    train_model(args.data_path, args.labels_path, model, learning_rate, num_epochs, patience, None)
+    train_model(args.data_path, args.labels_path, model, learning_rate, num_epochs, patience, transform)
 
     models_to_train = {
         'alexnet': models.alexnet(pretrained=False),

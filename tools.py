@@ -24,6 +24,26 @@ def calculate_pannuke_accuracy(model, dataloader, device):
     accuracy = (correct / total) if total != 0 else 0.0
     return accuracy
 
+def calculate_mean_and_std(dataloader):
+
+    # Initialize sums
+    mean = 0.
+    std = 0.
+    n_samples = 0
+
+    for images, _ in dataloader:
+        batch_samples = images.size(0)
+        n_samples += batch_samples
+        mean += images.mean([0, 2, 3]) * batch_samples
+        std += images.std([0, 2, 3]) * batch_samples
+
+    mean /= n_samples
+    std /= n_samples
+
+    print('mean:', mean)
+    print('std:', std)
+    return mean, std
+
 def build_input_for_classification_models(dataloader):
     classes_present = []
     for batch in tqdm(dataloader):
@@ -59,5 +79,5 @@ def create_multilabel_classification_dataloader(pannuke_module, purpose, labels_
     labels = torch.load(f'{labels_path}/{purpose}_labels.pt')
     dataloader = getattr(pannuke_module, f'{purpose}_dataloader')
     dataset = PanNukeMultiLabelClassificationDataset(dataloader.dataset, labels, transforms)
-    dataset = torch.utils.data.Subset(dataset, list(range(32)))
+    #dataset = torch.utils.data.Subset(dataset, list(range(32)))
     return DataLoader(dataset, batch_size=32, shuffle=shuffle)

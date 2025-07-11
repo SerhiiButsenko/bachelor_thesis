@@ -12,8 +12,8 @@ class PanNukeMultiLabelClassificationDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         image, _, _ = self.base_dataset.__getitem__(idx)
+        image = image.float() / 255.0
         if self.transforms is not None:
            image = self.transforms(image)
-        image = image.float() / 255.0
         label = self.labels[idx].float()
         return image, label
