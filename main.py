@@ -8,8 +8,10 @@ import argparse
 
 def main(args):
     #model = torchvision.models.alexnet(pretrained=False)
-    model = models.resnet50(pretrained=True)
-    model.fc = nn.Linear(in_features=model.fc.in_features, out_features=6)
+    # model = models.inception_v3(pretrained=True)
+    # model.fc = nn.Linear(in_features=model.fc.in_features, out_features=6)
+    model = models.efficientnet_b0(pretrained=True)
+    model.classifier[1] = nn.Linear(in_features=model.classifier[1].in_features, out_features=6)
     learning_rate = 0.0005
     num_epochs = 500
     patience = 50
@@ -25,7 +27,7 @@ def main(args):
             hue=0.1
         ),
         # RandomRotate90(),
-        transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 2.0)),
+        #transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0)),
         transforms.Normalize(mean=mean, std=std),
         #transforms.ToTensor()
     ])

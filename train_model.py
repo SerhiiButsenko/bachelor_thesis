@@ -72,7 +72,7 @@ def train_model(data_path, labels_path, model, learning_rate, num_epochs, patien
     epochs_without_improvement = 0
 
     # 5. Define the optimizer for weight and bias updates
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-3)
 
     # 6. Define the training loop
     for epoch in range(num_epochs):
